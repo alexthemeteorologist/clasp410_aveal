@@ -40,6 +40,7 @@ def compare_warming():
     ax.set_xlabel('Year')
     ax.set_ylabel('Surface Temperature ($in K$)')
     fig.tight_layout()
+    plt.show()
     print(f'the final predicted temperature in 2000 is {temp_model[2]} degrees $K$')
     print(f'the final actual observed temperature in 2000 is {temp_observation[2]} degrees $K$')
     print(f'the actual temperature increase over the 100 year span is {temp_observation[2] - temp_model[2]} degrees Kelvin')
