@@ -78,7 +78,7 @@ def temp_kanger(t):
     t_amp = (adjusted_t_kanger - adjusted_t_kanger.mean()).max()
     return t_amp*np.sin(np.pi/180 * t - np.pi/2) + adjusted_t_kanger.mean()
 
-def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerbound = temp_kanger, upperbound = 5):
+def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerbound = temp_kanger, upperbound = 5, initial = 0):
     '''
     A function for solving the heat equation.
     Apply Neumann boundary conditions such that dU/dx = 0.
@@ -90,11 +90,11 @@ def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerb
     ----------
     c2 : float
         c^2, the square of the diffusion coefficient.
-    ----------
-    initial : func
-        A function of position; sets the intial conditions at t=`trange[0]`
-        Must accept an array of positions and return temperature at those
-        positions as an equally sized array.
+
+    initial : float or integer or None
+              The inital temperature profile. If None, the example problem's 
+              profile 4x - 4x^2 is used. The default = 0. 
+
     upperbound, lowerbound : None, scalar, or func
         Set the lower and upper boundary conditions. If either is set to
         None, then Neumann boundary condtions are used and the boundary value
@@ -102,7 +102,6 @@ def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerb
         Otherwise, Dirichlet conditions are used and either a scalar constantp
         is provided or a function should be provided that accepts time and
         returns a value. 
-
 
     tstop: float or integer
     the amount of time, in days, it will take to reach stable equilibrium of the permafrost. this can easily be changed in order to
@@ -115,6 +114,7 @@ def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerb
 
     dx: float or integer
     the timestep of meters for each graph; the heat plot and the kanger curve for the sake of resolution will be generally constant as well.
+
     Returns
     -------
     x, t : 1D Numpy arrays
@@ -136,10 +136,17 @@ def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerb
     t = np.linspace(0, tstop, N)
     x = np.linspace(0, xstop, M)
 
-    # Create solution matrix; set initial conditions
+    # Create solution matrix
     U = np.zeros([M, N])
+
+    # Set initial conditions
+    if initial is None:
+        U[:,0] = 4*x - 4*x**2 # default initial condition based on example problem
+    else:
+        U[:,0] = initial
+
     offset = 0 #in degrees celsius.
-    U[:,0] = 0 + offset #apply the offset conditions TO ALLLLL figures in order to change for different initial temperature 
+    U[:,0] = U[:,0] + offset #apply the offset conditions TO ALLLLL figures in order to change for different initial temperature 
 
     # Get our "r" coeff:
     r = c2 * (dt/dx**2)
@@ -226,3 +233,44 @@ def plot_heatsolver(t, x, U, title=None, **kwargs):
     plt.legend(loc = 'best')
     plt.show()
     return fig, ax1, ax2, map
+
+def validate_solver():
+    '''
+    This function validates the heat equation solver by comparing its solution
+    element-by-element to the example problem solution provided in the Lab 3 pdf.
+    This validation function has no returns but instead prints whether or not the 
+    solver was able to be validated successfully.
+
+    Parameters
+    ---------
+    None
+
+    Returns
+    -------
+    None
+    '''
+
+    # Define variable values (based on example problem)
+    xstop=1
+    tstop=0.2
+    dx=0.2
+    dt=0.02
+    c2=1
+    lowerbound=0
+    upperbound=0
+
+    # Call the function and store the returns
+    t, x, U = heatsolver(xstop=xstop, tstop=tstop, dx=dx, dt=dt, c2=c2, lowerbound=lowerbound, upperbound=upperbound, initial=None)
+
+    # Check that array shapes match first before validating
+    if U.shape == sol10p3.shape:
+        print('Shape of heatsolver() result matches shape of desired solution.')
+        
+        # Compare the solution values in U and sol10p3 to see if they match
+        if np.allclose(U, sol10p3, atol=1e-5): # atol is the allowed tolerance to account for rounding errors
+            print('heatsolver() function validated!!!\nAll values calculated from the solver match the given solution values.\n')
+        else:
+            print('Mismatching values found.\n')
+    
+    else:
+        raise ValueError('Shape of heatsolver() result DOES NOT match shape of desired solution. Cannot validate.')
