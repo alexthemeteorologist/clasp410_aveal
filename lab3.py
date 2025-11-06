@@ -91,7 +91,7 @@ def heatsolver(xstop = 100, tstop = 365*75, dx = .9, dt = .9, c2 = .0216, lowerb
     c2 : float
         c^2, the square of the diffusion coefficient.
 
-    initial : Numpy array or None
+    initial : float or integer or None
               The inital temperature profile. If None, the example problem's 
               profile 4x - 4x^2 is used. The default = 0. 
 
