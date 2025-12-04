@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 '''
 this code script has a few different functions runnable to produce all figures for lab 5.
+KEEP IN MIND THAT THE "gamma" parameter in snowball_earth IS ONLY NEEDED FOR QUESTION 4. IT NEEDS TO BE REMOVED
+FOR ALL OTHER problems unless you are running the code script for question 4 outputs only.
+
 for question 1, simply run the program and type into the terminal 
 problem1() 
 and the example graph will be replicated as shown in the lab handoutt.
@@ -13,8 +16,10 @@ for question 3, run in the terminal
 problem3() and then the comparison plots will show for the different dynamic albedos and the 
 radiative factors that have changed.
 
-for question 4, run in the terminal
-problem4() and then the final plot of snowball earth conditions with the Gamma multiplier will appear.
+for question 4, ADD TO the snowball_earth function definition "gamma", so that way it could be recognized
+when acknowledging the changes in gamma per every single step.
+
+now, you can run in the terminalproblem4() and then the final plot of snowball earth conditions with the Gamma multiplier will appear.
 
 COLLABORATORS: Tyler Overbeek and Katherine Paff.
 '''
@@ -120,7 +125,7 @@ def insolation(s0, lats):
     return insolation
 
 
-def snowball_earth(gamma, nlat=18, tfinal=10000, dt=1.0, lam=100., emiss=1.0,
+def snowball_earth(nlat=18, tfinal=10000, dt=1.0, lam=100., emiss=1.0,
                    init_cond=temp_warm, apply_spherecorr=False, albice=.6,
                    albgnd=.3, apply_insol=False, solar=1370):
     '''
